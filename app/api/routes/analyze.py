@@ -15,7 +15,6 @@ from ...services.gemini_client import analyze_text as gemini_analyze_text, analy
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
-
 @router.post("/analyze")
 async def analyze_text_route(request: AnalyzeRequest, username: str = Depends(get_current_username)):
     """
