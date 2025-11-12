@@ -1,65 +1,64 @@
-import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse
+import os
 
+from .api.routes import auth, analyze, history, stats
 from .db.database import init_db, migrate_json_history, ensure_db_schema
-from .api.routes.auth import router as auth_router
-from .api.routes.analyze import router as analyze_router
-from .api.routes.history import router as history_router
-from .api.routes.stats import router as stats_router
 
-app = FastAPI(title="PhishGuard AI - Dev Server")
+app = FastAPI(title="PhishGuard AI")
 
-# CORS abierto para dev (ajusta en prod)
+# CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], allow_credentials=True,
-    allow_methods=["*"], allow_headers=["*"],
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-# Inicialización DB y migraciones idempotentes
-init_db()
-migrate_json_history()
-ensure_db_schema()
+# Inicializar DB al arrancar
+@app.on_event("startup")
+async def startup_event():
+    init_db()
+    migrate_json_history()
+    ensure_db_schema()
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.dirname(HERE)
-STATIC_DIR = os.path.join(PROJECT_ROOT, "static")
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+# Incluir routers
+app.include_router(auth.router, tags=["auth"])
+app.include_router(analyze.router, tags=["analyze"])
+app.include_router(history.router, tags=["history"])
+app.include_router(stats.router, tags=["stats"])
 
-# Routers
-app.include_router(auth_router)
-app.include_router(analyze_router)
-app.include_router(history_router)
-app.include_router(stats_router)
+# Determinar la ruta de archivos estáticos
+# Los archivos static/ están en la raíz del proyecto, no dentro de app/
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+STATIC_DIR = os.path.join(BASE_DIR, "static")
 
-# Rutas raíz y estáticos "compatibles" con tu monolito
-@app.get("/")
-async def root():
-    index_path = os.path.join(STATIC_DIR, "index.html")
-    if os.path.exists(index_path):
-        return FileResponse(index_path, media_type="text/html")
-    return JSONResponse({"message": "Index file not found"}, status_code=404)
+# Si existe carpeta static/, servir archivos
+if os.path.exists(STATIC_DIR):
+    @app.get("/")
+    async def root():
+        index_path = os.path.join(STATIC_DIR, "index.html")
+        if os.path.exists(index_path):
+            return FileResponse(index_path, media_type="text/html")
+        return {"message": "PhishGuard AI API - v1.0"}
 
-@app.get("/style.css")
-async def css():
-    p = os.path.join(STATIC_DIR, "style.css")
-    if os.path.exists(p):
-        return FileResponse(p, media_type="text/css")
-    return JSONResponse({"detail": "style.css not found"}, status_code=404)
+    @app.get("/style.css")
+    async def get_css():
+        file_path = os.path.join(STATIC_DIR, "style.css")
+        if os.path.exists(file_path):
+            return FileResponse(file_path, media_type="text/css")
+        return {"error": "File not found"}
 
-@app.get("/script.js")
-async def js():
-    p = os.path.join(STATIC_DIR, "script.js")
-    if os.path.exists(p):
-        return FileResponse(p, media_type="application/javascript")
-    return JSONResponse({"detail": "script.js not found"}, status_code=404)
-
-@app.get("/favicon.ico")
-async def favicon():
-    p = os.path.join(STATIC_DIR, "favicon.ico")
-    if os.path.exists(p):
-        return FileResponse(p, media_type="image/x-icon")
-    return JSONResponse({"detail": "favicon not found"}, status_code=404)
+    @app.get("/script.js")
+    async def get_js():
+        file_path = os.path.join(STATIC_DIR, "script.js")
+        if os.path.exists(file_path):
+            return FileResponse(file_path, media_type="application/javascript")
+        return {"error": "File not found"}
+else:
+    @app.get("/")
+    async def root():
+        return {"message": "PhishGuard AI API - v1.0", "docs": "/docs"}

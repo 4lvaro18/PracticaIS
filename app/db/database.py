@@ -1,5 +1,4 @@
 import os, json, sqlite3, logging
-from . import repository
 from ..core.config import settings
 
 logging.basicConfig(level=logging.INFO)
