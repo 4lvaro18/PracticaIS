@@ -53,3 +53,16 @@ def delete_session(token: str) -> None:
     conn = get_db_conn(); cur = conn.cursor()
     cur.execute("DELETE FROM sessions WHERE token=?", (token,))
     conn.commit(); conn.close()
+
+# app/core/security.py
+SESSION_TTL_HOURS = 24 * 30   # 30 días
+
+def create_session(username: str) -> str:
+    token = secrets.token_urlsafe(32)
+    expires = (datetime.datetime.utcnow() +
+               datetime.timedelta(hours=SESSION_TTL_HOURS)).isoformat()
+    conn = get_db_conn(); cur = conn.cursor()
+    cur.execute("INSERT OR REPLACE INTO sessions(token,username,expires_at) VALUES(?,?,?)",
+                (token, username, expires))
+    conn.commit(); conn.close()
+    return token
