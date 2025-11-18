@@ -42,27 +42,56 @@ def clear_history_db(username: str | None = None):
 def get_stats_db_for_user(username: str):
     conn = get_db_conn()
     cur = conn.cursor()
-    cur.execute("SELECT COUNT(*) as total FROM history WHERE username=?", (username,))
-    total = cur.fetchone()["total"]
+    
+    # 1. Obtener TODAS las entradas (texto y URL)
     cur.execute(
-        'SELECT percentage FROM history WHERE type="texto" AND percentage IS NOT NULL AND username=?',
+        "SELECT type, verdict, percentage FROM history WHERE username=?",
         (username,)
     )
-    text_rows = [r[0] for r in cur.fetchall()]
+    rows = cur.fetchall()
     conn.close()
 
+    total = len(rows)
     if total == 0:
         return {"total": 0, "avg_risk": 0, "safe": 0, "suspicious": 0, "phishing": 0}
+
+    # 2. Normalizar porcentajes
+    # Si tiene porcentaje (texto), usarlo.
+    # Si no (URL), mapear veredicto a un % estimado para la estadística global.
+    normalized_scores = []
     
-    avg_risk = sum(text_rows) / len(text_rows) if text_rows else 0
-    safe = len([p for p in text_rows if p <= 33]) / len(text_rows) * 100 if text_rows else 0
-    suspicious = len([p for p in text_rows if 33 < p <= 66]) / len(text_rows) * 100 if text_rows else 0
-    phishing = len([p for p in text_rows if p > 66]) / len(text_rows) * 100 if text_rows else 0
+    for r in rows:
+        rtype = r["type"]
+        verdict = r["verdict"]
+        percentage = r["percentage"]
+        
+        if percentage is not None:
+            normalized_scores.append(percentage)
+        else:
+            # Mapeo de veredictos de URL a riesgo numérico
+            if verdict == "Segura":
+                normalized_scores.append(10) # Bajo riesgo
+            elif verdict == "Maliciosa":
+                normalized_scores.append(90) # Alto riesgo
+            else:
+                normalized_scores.append(50) # Sospechosa/Desconocido
+
+    # 3. Calcular métricas
+    avg_risk = sum(normalized_scores) / total if total > 0 else 0
+    
+    # Categorizar según el score normalizado
+    safe_count = len([s for s in normalized_scores if s <= 33])
+    suspicious_count = len([s for s in normalized_scores if 33 < s <= 66])
+    phishing_count = len([s for s in normalized_scores if s > 66])
+
+    safe_pct = (safe_count / total) * 100
+    suspicious_pct = (suspicious_count / total) * 100
+    phishing_pct = (phishing_count / total) * 100
     
     return {
         "total": total,
         "avg_risk": int(avg_risk),
-        "safe": int(safe),
-        "suspicious": int(suspicious),
-        "phishing": int(phishing)
+        "safe": int(safe_pct),
+        "suspicious": int(suspicious_pct),
+        "phishing": int(phishing_pct)
     }

@@ -1,14 +1,17 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="light">
+<html lang="es" data-theme="dark">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PhishGuard AI — Analizador de Phishing</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <div class="app">
     <!-- Sidebar: Historial + Estadísticas -->
@@ -16,23 +19,32 @@
       <div class="sidebar-header">
         <div class="brand" title="PhishGuard AI">
           <div class="logo" aria-hidden="true">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2l7 3v6c0 5-3.5 9.74-7 11-3.5-1.26-7-6-7-11V5l7-3z" stroke="currentColor" stroke-width="1.4" fill="currentColor" opacity=".85"/>
-              <path d="M8 11l3 3 5-5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2l7 3v6c0 5-3.5 9.74-7 11-3.5-1.26-7-6-7-11V5l7-3z" stroke="white" stroke-width="2"
+                fill="none" />
+              <path d="M9 12l2 2 4-4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
           </div>
           PhishGuard AI
         </div>
         <div class="actions">
-          <button id="toggleTheme" class="btn btn-ghost" title="Cambiar tema">🌗</button>
+          <button id="toggleTheme" class="btn btn-ghost" title="Cambiar tema">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
           <button id="closeSidebar" class="btn btn-ghost mobilebar" title="Cerrar">✕</button>
         </div>
       </div>
 
       <section class="section" aria-labelledby="title-history">
         <div class="section-title">
-          <span id="title-history">Historial y Estadísticas</span>
-          <button id="clearHistory" class="btn btn-ghost" title="Limpiar todo (historial y estadísticas)">🗑️</button>
+          <span id="title-history">Historial Reciente</span>
+          <button id="clearHistory" class="btn btn-ghost" title="Limpiar todo" style="padding: 4px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </button>
         </div>
         <div id="history">
           <ul class="history-list" id="historyList"></ul>
@@ -40,31 +52,37 @@
       </section>
 
       <section class="section" aria-labelledby="title-stats">
-        <div class="section-title"><span id="title-stats">Resumen</span></div>
+        <div class="section-title"><span id="title-stats">Resumen Global</span></div>
         <div id="stats">
           <div class="stats-grid">
             <div class="stat-card">
               <div class="stat-kpi" id="kpi-total">0</div>
-              <div class="stat-label">Total consultas</div>
+              <div class="stat-label">Consultas</div>
             </div>
             <div class="stat-card">
               <div class="stat-kpi" id="kpi-avg">0%</div>
-              <div class="stat-label">Riesgo medio (texto)</div>
+              <div class="stat-label">Riesgo Medio</div>
             </div>
             <div class="stat-card">
               <div class="stat-kpi" id="kpi-safe">0%</div>
               <div class="stat-label">Seguras</div>
-              <div class="gauge" aria-hidden="true"><div class="gauge-fill" id="g-safe"></div></div>
+              <div class="gauge" aria-hidden="true">
+                <div class="gauge-fill" id="g-safe"></div>
+              </div>
             </div>
             <div class="stat-card">
               <div class="stat-kpi" id="kpi-suspicious">0%</div>
               <div class="stat-label">Sospechosas</div>
-              <div class="gauge" aria-hidden="true"><div class="gauge-fill" id="g-suspicious"></div></div>
+              <div class="gauge" aria-hidden="true">
+                <div class="gauge-fill" id="g-suspicious"></div>
+              </div>
             </div>
             <div class="stat-card">
               <div class="stat-kpi" id="kpi-phishing">0%</div>
               <div class="stat-label">Phishing</div>
-              <div class="gauge" aria-hidden="true"><div class="gauge-fill" id="g-phishing"></div></div>
+              <div class="gauge" aria-hidden="true">
+                <div class="gauge-fill" id="g-phishing"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -74,71 +92,114 @@
     <!-- Área principal -->
     <main class="main">
       <div class="topbar">
-        <div style="display:flex; align-items:center; gap:10px;">
+        <div style="display:flex; align-items:center; gap:16px;">
           <button id="openSidebar" class="btn btn-ghost mobilebar" title="Abrir barra lateral">☰</button>
-          <h1 style="margin:0; font-size:20px;">Analizador de Phishing</h1>
+          <h1>Analizador de Phishing</h1>
         </div>
         <div class="actions">
-          <button id="prefillDemo" class="btn" title="Rellenar ejemplo">Ejemplo</button>
-          <button id="resetForm" class="btn" title="Limpiar campos">Limpiar</button>
-          <div id="authArea" style="display:flex; gap:8px; align-items:center;">
-            <button id="btnLoginOpen" class="btn">Login</button>
-            <span id="loggedUser" style="font-weight:600; color:var(--muted);"></span>
+          <button id="prefillDemo" class="btn btn-ghost" title="Rellenar ejemplo">Ejemplo</button>
+          <button id="resetForm" class="btn btn-ghost" title="Limpiar campos">Limpiar</button>
+          <div id="authArea"
+            style="display:flex; gap:12px; align-items:center; margin-left: 12px; padding-left: 12px; border-left: 1px solid var(--card-border);">
+            <span id="loggedUser" style="font-weight:600; font-size: 14px; color:var(--text-main);"></span>
+            <button id="btnLoginOpen" class="btn btn-primary">Login</button>
           </div>
         </div>
       </div>
 
       <div class="card">
-        <h2 class="card-title">Analiza un texto</h2>
-        <label for="textInput">Pega un texto sospechoso</label>
-        <textarea id="textInput" placeholder="Ejemplo: 'Su cuenta ha sido comprometida...'" aria-label="Texto a analizar"></textarea>
-        <div style="display:flex; gap:10px; margin-top:10px;">
+        <h2 class="card-title">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          Analiza un texto
+        </h2>
+        <label for="textInput">Pega el contenido del correo o mensaje sospechoso</label>
+        <textarea id="textInput" placeholder="Ejemplo: 'Su cuenta ha sido comprometida, haga clic aquí...'"
+          aria-label="Texto a analizar"></textarea>
+        <div style="display:flex; gap:10px; margin-top:16px;">
           <button class="btn btn-primary" id="btnAnalyzeText" onclick="analyzeText()">Analizar texto</button>
         </div>
-        <p class="hint">Detectaremos URLs, lenguaje engañoso y señales de phishing. El nivel de riesgo se mostrará abajo.</p>
+        <p class="hint">Detectaremos URLs maliciosas, patrones de ingeniería social y lenguaje de urgencia.</p>
       </div>
 
       <div class="split">
         <div class="card">
-          <h2 class="card-title">Analiza una URL</h2>
-          <label for="urlInput">Introduce una URL para verificar</label>
+          <h2 class="card-title">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+            Analiza una URL
+          </h2>
+          <label for="urlInput">Introduce el enlace para verificar</label>
           <input id="urlInput" type="text" placeholder="https://ejemplo-dudoso.com" aria-label="URL a analizar" />
-          <div style="display:flex; gap:10px; margin-top:10px;">
+          <div style="display:flex; gap:10px; margin-top:16px;">
             <button class="btn btn-primary" id="btnAnalyzeUrl" onclick="analyzeUrl()">Analizar URL</button>
           </div>
-          <p class="hint">Comprobamos reputación y posibles redirecciones maliciosas.</p>
+          <p class="hint">Verificamos la reputación del dominio y certificados SSL.</p>
         </div>
 
         <div class="card">
-          <h2 class="card-title">Resultado</h2>
-          <div id="result" role="status" aria-live="polite"></div>
-          <div id="riskBarContainer" aria-hidden="true">
-            <p style="margin:10px 0 8px; font-weight:600;">Nivel de riesgo</p>
-            <div id="riskBar"></div>
-            <div id="riskArrow"></div>
-            <p id="riskPercentage"></p>
+          <h2 class="card-title">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            Resultados
+          </h2>
+          <div id="result" role="status" aria-live="polite">
+            <p style="color: var(--text-muted); text-align: center; margin: 20px 0;">Los resultados del análisis
+              aparecerán aquí.</p>
+          </div>
+          <div id="riskBarContainer" aria-hidden="true" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:baseline;">
+              <p style="margin:0; font-weight:600; font-size:14px;">Nivel de riesgo detectado</p>
+              <p id="riskPercentage" style="color: var(--text-main);"></p>
+            </div>
+            <div id="riskBar">
+              <div id="riskArrow"></div>
+            </div>
           </div>
         </div>
       </div>
     </main>
   </div>
 
-  <div id="loading"><div class="spinner" aria-label="Cargando"></div></div>
+  <div id="loading">
+    <div class="spinner" aria-label="Cargando"></div>
+  </div>
   <div class="toast" id="toast"></div>
 
-  <div id="loginModal" style="position:fixed; inset:0; display:none; place-items:center; z-index:60; background: rgba(0,0,0,.4);">
-    <div style="background:var(--card); padding:18px; border-radius:12px; width:320px;">
-      <h3 style="margin:0 0 10px">Iniciar sesión / Registrar</h3>
-      <input id="authUsername" type="text" placeholder="Usuario" style="width:100%; padding:8px; margin-bottom:8px;" />
-      <input id="authPassword" type="password" placeholder="Contraseña" style="width:100%; padding:8px; margin-bottom:12px;" />
-      <div style="display:flex; gap:8px; justify-content:flex-end;">
-        <button id="authSignup" class="btn">Signup</button>
-        <button id="authLogin" class="btn btn-primary">Login</button>
-        <button id="authClose" class="btn btn-ghost">Cerrar</button>
+  <!-- Login Modal -->
+  <div id="loginModal"
+    style="position:fixed; inset:0; display:none; place-items:center; z-index:1000; background: rgba(0,0,0,0.6);">
+    <div>
+      <h3>Acceso de Usuario</h3>
+      <p style="text-align:center; color:var(--text-muted); margin-bottom:24px;">Ingresa tus credenciales para acceder
+        al historial.</p>
+
+      <label for="authUsername">Usuario</label>
+      <input id="authUsername" type="text" placeholder="nombre de usuario" style="margin-bottom:16px;" />
+
+      <label for="authPassword">Contraseña</label>
+      <input id="authPassword" type="password" placeholder="••••••••" style="margin-bottom:24px;" />
+
+      <div style="display:flex; gap:12px; justify-content:space-between; margin-top: 12px;">
+        <button id="authClose" class="btn btn-ghost">Cancelar</button>
+        <div style="display:flex; gap:12px;">
+          <button id="authSignup" class="btn btn-ghost" style="color: var(--primary);">Registrarse</button>
+          <button id="authLogin" class="btn btn-primary">Iniciar Sesión</button>
+        </div>
       </div>
     </div>
   </div>
 
   <script src="script.js"></script>
 </body>
+
 </html>
